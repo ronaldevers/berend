@@ -38,3 +38,10 @@ The default name of the config file is the lowercased name of the bot's class
 name, so `berend.conf` in the example. If you want to use a different config
 file, then you need to set the `BOT_CONFIG` environment variable to its
 absolute path.
+
+See Also
+--------
+
+The bot is a Twisted IRC client. Check out the [Twisted documentation](http://twistedmatrix.com/documents/12.2.0/api/twisted.words.protocols.irc.IRCClient.html) and the [ircLogBot example](http://twistedmatrix.com/documents/current/core/howto/clients.html#auto5) for more information.
+
+Oh and of course: [Berend Botje](http://nl.wikipedia.org/wiki/Berend_Botje_ging_uit_varen)
