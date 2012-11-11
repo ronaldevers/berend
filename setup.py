@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='botlerplate',
-    packages=['botlerplate'],
+    py_modules=['botlerplate'],
     version='0.1',
     author='Ronald Evers',
     author_email='ronald@ch10.nl',
@@ -15,4 +15,5 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules'],
+    install_requires=['twisted'],
 )
