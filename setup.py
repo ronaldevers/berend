@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='botlerplate',
-    py_modules=['botlerplate'],
+    packages=['botlerplate'],
     version='0.1',
     author='Ronald Evers',
     author_email='ronald@ch10.nl',

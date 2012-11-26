@@ -5,6 +5,8 @@ from twisted.internet import reactor, ssl
 from twisted.internet.protocol import ClientFactory, Protocol
 from twisted.words.protocols import irc
 
+from botlerplate.plugin import load_plugins
+
 
 IRC = 'irc'  # the config file section for irc settings
 
@@ -16,10 +18,11 @@ class BotClientFactory(ClientFactory):
         """Stores the bot_class and config as instance variables."""
         self.bot_class = bot_class
         self.config = config
+        self.plugins = plugins
 
     def buildProtocol(self, addr):
         """Instantiates a class of the type `self.bot_class`."""
-        self.bot = protocol = self.bot_class(self.config)
+        self.bot = protocol = self.bot_class(self.config, self.plugins)
         protocol.factory = self
         return protocol
 
@@ -40,9 +43,12 @@ class Bot(irc.IRCClient):
     This class contains the boilerplate code needed in a twisted irc client
     class. Subclass this and implement privmsg."""
 
-    def __init__(self, config):
+    def __init__(self, config, plugins):
         print("Calling Bot.__init__")
+
         self.config = config
+        self.plugins = plugins
+
         self.channel = self.config.get(IRC, 'channel')
         self.nickname = self.config.get(IRC, 'nickname')
         self.realname = self.config.get(IRC, 'realname')
@@ -65,6 +71,21 @@ class Bot(irc.IRCClient):
     def joined(self, channel):
         """Logs a notice."""
         print('Joined %s.' % channel)
+
+    def privmsg(self, user, channel, msg):
+        if not msg.startswith("%s: " % self.nickname):
+            return
+
+        msg = msg[len(self.nickname) + 2:].strip()  # 1 for colon, 1 for space
+
+        for plugin in self.plugins:
+            if plugin.privmsg(user, channel, msg):
+                return
+        self.default_privmsg_handler()
+
+    def default_privmsg_handler(self):
+        """Override this in subclass if you want to customize."""
+        self.say(self.channel, "Don't understand.")
 
 
 def _get_config_filename(default_filename):
@@ -96,6 +117,7 @@ def start_bot(bot_class, run_reactor=True):
     """
     
     config = _load_config('%s.conf' % bot_class.__name__.lower())
+    plugins = load_plugins(config)
     factory = BotClientFactory(bot_class, config)
 
     if config.getboolean(IRC, 'ssl'):
