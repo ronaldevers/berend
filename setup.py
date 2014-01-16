@@ -1,20 +1,26 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
-    name='botlerplate',
-    packages=['botlerplate'],
-    version='0.1',
+    name='berend',
+    packages=find_packages('.'),
+    version='0.3',
     author='Ronald Evers',
     author_email='ronald@ch10.nl',
-    url='https://github.com/ronaldevers/botlerplate',
-    description='Boilerplate for Twisted IRC bots',
+    url='https://github.com/ronaldevers/berend',
+    description='Extensible IRC bot',
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
         'License :: Public Domain',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python',
-        'Topic :: Software Development :: Libraries :: Python Modules'],
-    install_requires=['twisted',
-                      'pyopenssl'],
+    ],
+    install_requires=[
+        'Flask >= 0.10.0',
+        'pyopenssl >= 0.13.0',
+        'pyyaml >= 3.10',
+        'twisted >= 13.0.0',
+    ],
+    entry_points={
+        'console_scripts': [
+            'berend = berend.noapi:main',
+        ],
+    },
 )

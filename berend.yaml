@@ -1,0 +1,18 @@
+irc:
+  host: irc.freenode.net
+  ssl: true
+  port: 6697
+  channels:
+    - berend-botje-test
+  nickname: berend
+  realname: Berend Botje
+# on_connect is a list of raw commands sent to the server on connect,
+# use this to identify for example:
+#
+#  on_connect:
+#    - "PRIVMSG NickServ :identify berend secret"
+
+plugins:
+  berend.plugins.help:
+  # add your plugins here, the key is the importable python module,
+  # the value is passed on to your plugin's setup method

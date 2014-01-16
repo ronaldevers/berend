@@ -1,9 +1,9 @@
-Botlerplate
-===========
+Berend
+======
 
-Boilerplate for Twisted IRC bots with support for SSL. If you use this
-module, you will not have to write any of the boilerplate and instead
-can focus on programming the behavior of your bot.
+Berend is a Twisted IRC bot with SSL-support. If you use this module,
+you will not have to write any of the boilerplate and instead can
+focus on programming the behavior of your bot.
 
 If you use SSL, there is no certificate checking so beware!
 
@@ -11,33 +11,50 @@ If you use SSL, there is no certificate checking so beware!
 Usage
 -----
 
-To build a bot you need to write a small Python module and a bot config file.
+To build a bot you need to write a bot config file (yaml) and some
+plugins (simple python modules).
 
-berend.conf:
+The default config file berend will look for is `berend.yaml`. If you
+want to use a different config file, then you need to set the
+`BEREND_CONFIG` environment variable to its path.
 
-    [irc]
-    host = sturgeon.freenode.net
-    port = 6697
-    ssl = yes
-    channel = #berend-botje-test
-    nickname = berend
-    realname = Berend Botje
+An example bot config file is included in the distribution and looks
+like this:
 
-berend.py:
+berend.yaml:
 
-    from botlerplate import Bot, start_bot
+    irc:
+      host: irc.freenode.net
+      ssl: true
+      port: 6697
+      channels:
+        - berend-botje-test
+      nickname: berend
+      realname: Berend Botje
+    # on_connect is a list of raw commands sent to the server on connect,
+    # use this to identify for example:
+    #
+    #  on_connect:
+    #    - "PRIVMSG NickServ :identify berend secret"
+    plugins:
+      berend.plugins.help:
+      myberend.plugins.hello:
 
-    class Berend(Bot):
-        def privmsg(self, user, channel, msg):
-            if msg.startswith("%s:" % self.nickname):
-                self.say(self.channel, "Berend Botje ging uit varen...")
+Add your plugins to the bottom. The key is the importable,
+dot-separated python module name, the value is passed on to your
+plugin's setup method. Look at the help plugin for a fully documented
+example.
 
-    start_bot(Berend)
+An example plugin looks like this:
 
-The default name of the config file is the lowercased name of the bot's class
-name, so `berend.conf` in the example. If you want to use a different config
-file, then you need to set the `BOT_CONFIG` environment variable to its
-absolute path.
+myberend/plugins/hello.py:
+
+    def setup(bot, config):
+        bot.respond('hello', hello, ('hello', 'force bot to greet you'))
+
+    def hello(bot, user, channel, msg, matches):
+        bot.reply(user, channel, 'hello to you %s' % user)
+
 
 See Also
 --------
