@@ -170,6 +170,15 @@ class Berend(irc.IRCClient):
         """
         self.actions.append((regex, callback, help))
 
+    def say(self, user, channel, message):
+        """Override twisted say method to add (r)stripping and not send empty
+        lines.
+
+        """
+        message = message.rstrip()
+        if message:
+            return super(Berend, self).say(user, channel, message)
+
     def reply(self, user, channel, message):
         """Sends message back to the user or channel.
 
@@ -180,7 +189,7 @@ class Berend(irc.IRCClient):
         is utf8-encoded.
 
         """
-        message = message.strip()
+        message = message.rstrip()
         if not message:
             return
 
