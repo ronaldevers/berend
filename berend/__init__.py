@@ -75,7 +75,10 @@ class Berend(irc.IRCClient):
                 traceback.print_exc()
                 raise e  # die!
 
-            plugin.setup(self, plugin_config)
+            # merge global and plugin-specific config
+            merged_plugin_config = self.config.get('global', {}).copy()
+            merged_plugin_config.update(plugin_config)
+            plugin.setup(self, merged_plugin_config)
 
     ########################################################################
     # twisted callbacks
