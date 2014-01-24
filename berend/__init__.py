@@ -77,7 +77,8 @@ class Berend(irc.IRCClient):
 
             # merge global and plugin-specific config
             merged_plugin_config = self.config.get('global', {}).copy()
-            merged_plugin_config.update(plugin_config)
+            print 'merged', merged_plugin_config
+            merged_plugin_config.update(plugin_config or {})
             plugin.setup(self, merged_plugin_config)
 
     ########################################################################
