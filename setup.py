@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name='berend',
     packages=find_packages('.'),
-    version='0.3',
+    version='0.4',
     author='Ronald Evers',
     author_email='ronald@ch10.nl',
     url='https://github.com/ronaldevers/berend',
