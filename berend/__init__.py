@@ -1,5 +1,6 @@
 import importlib
 import os
+import random
 import re
 import traceback
 
@@ -54,6 +55,21 @@ class Berend(irc.IRCClient):
     write your own plugins.
 
     """
+
+    errors = (
+        'Windows Must Restart Because the Remote Procedure Call (RPC) Service Terminated Unexpectedly',
+        '400 Bad Request',
+        'PC LOAD LETTER',
+        'Not ready reading drive A\nAbort, Retry, Fail?',
+        'RETURN WITHOUT GOSUB',
+        'FORMULA TOO COMPLEX',
+        'Bad command or file name',
+        'Guru Meditation',
+        'Click \'OK\' to continue',
+        'lp0 on fire',
+        'Huh?',
+        'Dat begrijp ik niet, ik ga varen.',
+    )
 
     def __init__(self, config):
         self.config = config
@@ -124,15 +140,24 @@ class Berend(irc.IRCClient):
         """
 
         print "privmsg user=%s channel=%s msg=%s" % (user, channel, msg)
+
+        if channel == self.nickname and not msg.startswith(self.nickname):
+            msg = '%s: %s' % (self.nickname, msg)
+
+        have_match = False
         for (regex, callback, _) in self.actions:
             try:
                 matches = re.search(regex, msg)
                 if matches:
+                    have_match = True
                     callback(self, user, channel, msg, matches)
             except Exception, e:
                 self.reply(user, channel, 'ouch, the %s action caused an exception: %s'
                          % (callback.__name__, str(e)))
                 traceback.print_exc()
+
+        if not have_match and msg.startswith(self.nickname):
+            self.reply(user, channel, random.choice(self.errors))
 
     ########################################################################
     # end twisted callbacks
@@ -174,12 +199,26 @@ class Berend(irc.IRCClient):
         """
         self.actions.append((regex, callback, help))
 
+    def msg(self, user, message, length=None):
+        """Override twisted say method to add (r)stripping and not send empty
+        lines.
+
+        """
+        message = message.rstrip()
+        if isinstance(message, unicode):
+            message = message.encode('utf-8')
+        if message:
+            # cant use super because IRCClient is an old-style class
+            return irc.IRCClient.msg(self, user, message, length)
+
     def say(self, channel, message):
         """Override twisted say method to add (r)stripping and not send empty
         lines.
 
         """
         message = message.rstrip()
+        if isinstance(message, unicode):
+            message = message.encode('utf-8')
         if message:
             # cant use super because IRCClient is an old-style class
             return irc.IRCClient.say(self, channel, message)
